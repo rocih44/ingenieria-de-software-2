@@ -1,14 +1,18 @@
-# backend/app/db/models/deposito.py
-from sqlalchemy import Column, Integer, String, Text
-from sqlalchemy.orm import relationship
-from app.db.base import Base
+from typing import List
+from sqlalchemy import Integer, String
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from app.db.models.movimiento import Movimiento
 
+class Base(DeclarativeBase):
+     pass   
 
-class DepositoORM(Base):
-    __tablename__ = "DEPOSITO"
+class Deposito(Base):
+    __tablename__ = "deposito"
 
-    id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String(255), nullable=False)
-    ubicacion = Column(String(300), nullable=True) 
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    nombre: Mapped[str] = mapped_column(String(50), nullable=False)
+    ubicacion: Mapped[str] = mapped_column(String(100), nullable=False)
 
-    movimientos = relationship("MovimientoORM", back_populates="deposito")
+    # Relación bidireccional con Movimiento, back_populates indica el atributo en la clase Movimiento que referencia a Deposito.
+    movimientos_origen: Mapped[List["Movimiento"]] = relationship(back_populates="deposito_origen", foreign_keys="[Movimiento.deposito_origen_id]")
+    movimientos_destino: Mapped[List["Movimiento"]] = relationship(back_populates="deposito_destino", foreign_keys="[Movimiento.deposito_destino_id]")    
